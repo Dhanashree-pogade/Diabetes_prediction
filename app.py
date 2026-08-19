@@ -4,8 +4,8 @@ from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
 
-# Load the model directly
-model = joblib.load("model.pkl")
+# Load the model matching your exact file name
+model = joblib.load("model(1).pkl")
 
 # List of expected features in order
 FEATURE_NAMES = [
