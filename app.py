@@ -5,7 +5,7 @@ from flask import Flask, render_template_string, request
 app = Flask(__name__)
 
 # Load the model directly
-model = joblib.load("model.kl")
+model = joblib.load("model.pkl")
 
 # List of expected features in order
 FEATURE_NAMES = [
