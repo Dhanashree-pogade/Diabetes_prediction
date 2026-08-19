@@ -3,37 +3,25 @@ import joblib
 import numpy as np
 import os
 
-# ============================================================
-# Flask App
-# ============================================================
-
 app = Flask(__name__)
 
 # Load trained model
-MODEL_PATH = "model.pkl"
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "model.pkl")
 model = joblib.load(MODEL_PATH)
 
-
-# ============================================================
-# Prediction Labels
-# ============================================================
-
+# Model output labels
 CLASS_LABELS = {
     0: "Low Risk",
     1: "Medium Risk",
     2: "High Risk"
 }
 
-
-# ============================================================
-# HTML + CSS
-# ============================================================
-
 HTML = """
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -50,112 +38,134 @@ HTML = """
 
         body {
             min-height: 100vh;
+
             background:
-                radial-gradient(circle at top left, #dbeafe 0%, transparent 35%),
-                radial-gradient(circle at bottom right, #e0e7ff 0%, transparent 35%),
-                linear-gradient(135deg, #f8fafc, #eef2ff);
+                radial-gradient(
+                    circle at top left,
+                    rgba(99, 102, 241, 0.20),
+                    transparent 35%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    rgba(139, 92, 246, 0.18),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    135deg,
+                    #f8fafc,
+                    #eef2ff
+                );
 
             color: #1e293b;
         }
 
-        /* Main container */
-
-        .container {
-            width: 92%;
-            max-width: 1100px;
-            margin: 40px auto;
+        .page {
+            width: 94%;
+            max-width: 1150px;
+            margin: 35px auto;
         }
 
-        /* Header */
+        /* HEADER */
 
         .header {
             text-align: center;
             margin-bottom: 30px;
         }
 
-        .header .icon {
+        .logo {
             width: 70px;
             height: 70px;
-            margin: 0 auto 15px;
+
+            margin: auto;
+            margin-bottom: 16px;
 
             display: flex;
             align-items: center;
             justify-content: center;
 
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: white;
-
             border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4f46e5,
+                    #7c3aed
+                );
+
+            color: white;
 
             font-size: 32px;
 
-            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.25);
+            box-shadow:
+                0 15px 35px rgba(79, 70, 229, 0.25);
         }
 
         .header h1 {
-            font-size: 34px;
-            font-weight: 700;
+            font-size: 36px;
             color: #111827;
+            margin-bottom: 8px;
         }
 
         .header p {
-            margin-top: 8px;
             color: #64748b;
             font-size: 15px;
         }
 
-        /* Card */
+        /* CARD */
 
         .card {
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255,255,255,0.96);
 
-            border: 1px solid rgba(226, 232, 240, 0.9);
-
-            border-radius: 24px;
+            border-radius: 25px;
 
             padding: 35px;
 
+            border: 1px solid #e2e8f0;
+
             box-shadow:
-                0 20px 50px rgba(15, 23, 42, 0.08),
-                0 4px 15px rgba(15, 23, 42, 0.04);
+                0 25px 60px rgba(15,23,42,0.08);
         }
 
-        /* Section */
+        /* SECTION */
 
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
-        .section-title {
+        .section-header {
             display: flex;
             align-items: center;
-            gap: 10px;
 
-            margin-bottom: 20px;
+            gap: 12px;
 
-            font-size: 19px;
-            font-weight: 650;
+            margin-bottom: 22px;
 
-            color: #1e293b;
+            padding-bottom: 12px;
+
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .section-title span {
-            width: 34px;
-            height: 34px;
+        .section-icon {
+            width: 38px;
+            height: 38px;
+
+            border-radius: 11px;
 
             display: flex;
             align-items: center;
             justify-content: center;
 
-            border-radius: 10px;
-
             background: #eef2ff;
-            color: #4f46e5;
 
-            font-size: 16px;
+            font-size: 18px;
         }
 
-        /* Grid */
+        .section-header h2 {
+            font-size: 19px;
+            color: #1e293b;
+        }
+
+        /* FORM GRID */
 
         .form-grid {
             display: grid;
@@ -163,30 +173,30 @@ HTML = """
             grid-template-columns:
                 repeat(3, minmax(0, 1fr));
 
-            gap: 18px;
+            gap: 20px;
         }
-
-        /* Form group */
 
         .form-group {
             display: flex;
             flex-direction: column;
         }
 
-        .form-group label {
-            margin-bottom: 7px;
-
+        label {
             font-size: 13px;
+
             font-weight: 600;
 
             color: #475569;
+
+            margin-bottom: 7px;
         }
 
-        .form-group input,
-        .form-group select {
+        input,
+        select {
+
             width: 100%;
 
-            padding: 12px 13px;
+            padding: 13px 14px;
 
             border: 1px solid #dbe2ea;
 
@@ -200,46 +210,46 @@ HTML = """
 
             outline: none;
 
-            transition: 0.2s ease;
+            transition: all 0.2s ease;
         }
 
-        .form-group input:focus,
-        .form-group select:focus {
-            border-color: #6366f1;
+        input:hover,
+        select:hover {
+            border-color: #a5b4fc;
+        }
+
+        input:focus,
+        select:focus {
 
             background: white;
 
+            border-color: #6366f1;
+
             box-shadow:
-                0 0 0 3px rgba(99, 102, 241, 0.10);
+                0 0 0 4px rgba(99,102,241,0.10);
         }
-
-        .form-group input::placeholder {
-            color: #94a3b8;
-        }
-
-        /* Help text */
 
         .help {
-            margin-top: 5px;
-
             font-size: 11px;
 
             color: #94a3b8;
+
+            margin-top: 5px;
         }
 
-        /* Button */
+        /* BUTTON */
 
-        .button-container {
+        .button-area {
             margin-top: 10px;
-            text-align: center;
         }
 
-        .predict-btn {
+        .predict-button {
+
             width: 100%;
 
-            padding: 15px;
-
             border: none;
+
+            padding: 16px;
 
             border-radius: 13px;
 
@@ -254,53 +264,58 @@ HTML = """
 
             font-size: 16px;
 
-            font-weight: 650;
+            font-weight: 700;
 
             cursor: pointer;
 
             box-shadow:
-                0 10px 25px rgba(79, 70, 229, 0.25);
+                0 12px 25px rgba(79,70,229,0.25);
 
-            transition: 0.25s ease;
+            transition: all 0.25s ease;
         }
 
-        .predict-btn:hover {
+        .predict-button:hover {
+
             transform: translateY(-2px);
 
             box-shadow:
-                0 14px 30px rgba(79, 70, 229, 0.35);
+                0 17px 32px rgba(79,70,229,0.35);
         }
 
-        .predict-btn:active {
+        .predict-button:active {
             transform: translateY(0);
         }
 
-        /* Result */
+        /* RESULT */
 
         .result {
+
             margin-top: 30px;
 
-            padding: 25px;
+            padding: 28px;
 
             border-radius: 18px;
 
             text-align: center;
 
-            background: linear-gradient(
-                135deg,
-                #eef2ff,
-                #f5f3ff
-            );
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef2ff,
+                    #f5f3ff
+                );
 
-            border: 1px solid #ddd6fe;
+            border:
+                1px solid #ddd6fe;
         }
 
-        .result-title {
-            font-size: 13px;
+        .result-label {
+
+            font-size: 12px;
 
             text-transform: uppercase;
 
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
 
             color: #64748b;
 
@@ -308,25 +323,28 @@ HTML = """
         }
 
         .result-value {
-            font-size: 30px;
 
-            font-weight: 750;
+            font-size: 32px;
+
+            font-weight: 800;
 
             color: #4f46e5;
         }
 
         .confidence {
-            margin-top: 8px;
 
-            font-size: 13px;
+            margin-top: 10px;
 
             color: #64748b;
+
+            font-size: 14px;
         }
 
-        /* Error */
+        /* ERROR */
 
         .error {
-            margin-top: 20px;
+
+            margin-top: 25px;
 
             padding: 15px;
 
@@ -343,32 +361,53 @@ HTML = """
             font-size: 14px;
         }
 
-        /* Footer */
+        /* INFO */
+
+        .info {
+
+            margin-top: 25px;
+
+            padding: 14px 16px;
+
+            border-radius: 12px;
+
+            background: #f8fafc;
+
+            border: 1px solid #e2e8f0;
+
+            color: #64748b;
+
+            font-size: 12px;
+
+            line-height: 1.6;
+        }
+
+        /* FOOTER */
 
         .footer {
+
             text-align: center;
 
             margin-top: 25px;
 
-            font-size: 12px;
-
             color: #94a3b8;
+
+            font-size: 12px;
         }
 
-        /* Responsive */
+        /* RESPONSIVE */
 
-        @media (max-width: 850px) {
+        @media (max-width: 900px) {
 
             .form-grid {
-                grid-template-columns:
-                    repeat(2, minmax(0, 1fr));
+                grid-template-columns: repeat(2, 1fr);
             }
 
         }
 
-        @media (max-width: 550px) {
+        @media (max-width: 600px) {
 
-            .container {
+            .page {
                 width: 95%;
                 margin: 20px auto;
             }
@@ -382,29 +421,35 @@ HTML = """
             }
 
             .header h1 {
-                font-size: 27px;
+                font-size: 28px;
+            }
+
+            .logo {
+                width: 60px;
+                height: 60px;
             }
 
         }
 
     </style>
+
 </head>
 
 
 <body>
 
-<div class="container">
+<div class="page">
 
     <div class="header">
 
-        <div class="icon">
+        <div class="logo">
             ♥
         </div>
 
         <h1>Health Risk Prediction</h1>
 
         <p>
-            AI-powered health risk assessment using your trained machine learning model
+            Machine Learning Based Health Risk Assessment System
         </p>
 
     </div>
@@ -414,21 +459,29 @@ HTML = """
 
         <form method="POST">
 
-            <!-- ================================================= -->
-            <!-- Personal Information -->
-            <!-- ================================================= -->
+
+            <!-- PERSONAL INFORMATION -->
 
             <div class="section">
 
-                <div class="section-title">
-                    <span>👤</span>
-                    Personal Information
+                <div class="section-header">
+
+                    <div class="section-icon">
+                        👤
+                    </div>
+
+                    <h2>Personal Information</h2>
+
                 </div>
+
 
                 <div class="form-grid">
 
+
                     <div class="form-group">
+
                         <label>Age</label>
+
                         <input
                             type="number"
                             name="age"
@@ -438,6 +491,7 @@ HTML = """
                             placeholder="e.g. 35"
                             required
                         >
+
                     </div>
 
 
@@ -454,7 +508,7 @@ HTML = """
                         >
 
                         <span class="help">
-                            Enter the numeric encoding used during training
+                            Enter the value used during model training
                         </span>
 
                     </div>
@@ -473,7 +527,7 @@ HTML = """
                         >
 
                         <span class="help">
-                            Enter the numeric encoding used during training
+                            Enter the value used during model training
                         </span>
 
                     </div>
@@ -524,7 +578,7 @@ HTML = """
                         >
 
                         <span class="help">
-                            Enter the numeric encoding used during training
+                            Enter the value used during model training
                         </span>
 
                     </div>
@@ -534,27 +588,45 @@ HTML = """
             </div>
 
 
-            <!-- ================================================= -->
-            <!-- Lifestyle -->
-            <!-- ================================================= -->
+            <!-- LIFESTYLE -->
 
             <div class="section">
 
-                <div class="section-title">
-                    <span>🏃</span>
-                    Lifestyle Information
+                <div class="section-header">
+
+                    <div class="section-icon">
+                        🏃
+                    </div>
+
+                    <h2>Lifestyle Information</h2>
+
                 </div>
 
+
                 <div class="form-grid">
+
 
                     <div class="form-group">
 
                         <label>Family History of Diabetes</label>
 
-                        <select name="family_history_diabetes" required>
-                            <option value="">Select</option>
-                            <option value="0">No (0)</option>
-                            <option value="1">Yes (1)</option>
+                        <select
+                            name="family_history_diabetes"
+                            required
+                        >
+
+                            <option value="">
+                                Select
+                            </option>
+
+                            <option value="0">
+                                No
+                            </option>
+
+                            <option value="1">
+                                Yes
+                            </option>
+
                         </select>
 
                     </div>
@@ -572,10 +644,6 @@ HTML = """
                             required
                         >
 
-                        <span class="help">
-                            Numeric encoding from training dataset
-                        </span>
-
                     </div>
 
 
@@ -590,10 +658,6 @@ HTML = """
                             placeholder="Encoded value"
                             required
                         >
-
-                        <span class="help">
-                            Numeric encoding from training dataset
-                        </span>
 
                     </div>
 
@@ -610,10 +674,6 @@ HTML = """
                             required
                         >
 
-                        <span class="help">
-                            Numeric encoding from training dataset
-                        </span>
-
                     </div>
 
 
@@ -628,10 +688,6 @@ HTML = """
                             placeholder="Encoded value"
                             required
                         >
-
-                        <span class="help">
-                            Numeric encoding from training dataset
-                        </span>
 
                     </div>
 
@@ -672,18 +728,23 @@ HTML = """
             </div>
 
 
-            <!-- ================================================= -->
-            <!-- Medical Information -->
-            <!-- ================================================= -->
+            <!-- MEDICAL INFORMATION -->
 
             <div class="section">
 
-                <div class="section-title">
-                    <span>🩺</span>
-                    Medical Information
+                <div class="section-header">
+
+                    <div class="section-icon">
+                        🩺
+                    </div>
+
+                    <h2>Medical Information</h2>
+
                 </div>
 
+
                 <div class="form-grid">
+
 
                     <div class="form-group">
 
@@ -753,20 +814,19 @@ HTML = """
             </div>
 
 
-            <!-- ================================================= -->
-            <!-- Button -->
-            <!-- ================================================= -->
+            <!-- BUTTON -->
 
-            <div class="button-container">
+            <div class="button-area">
 
                 <button
                     type="submit"
-                    class="predict-btn"
+                    class="predict-button"
                 >
                     🔍 Predict Health Risk
                 </button>
 
             </div>
+
 
         </form>
 
@@ -775,7 +835,7 @@ HTML = """
 
         <div class="result">
 
-            <div class="result-title">
+            <div class="result-label">
                 Prediction Result
             </div>
 
@@ -784,9 +844,11 @@ HTML = """
             </div>
 
             {% if probability %}
+
             <div class="confidence">
-                Model confidence: {{ probability }}%
+                Model Confidence: {{ probability }}%
             </div>
+
             {% endif %}
 
         </div>
@@ -797,19 +859,34 @@ HTML = """
         {% if error %}
 
         <div class="error">
-            ⚠ {{ error }}
+            ⚠️ {{ error }}
         </div>
 
         {% endif %}
+
+
+        <div class="info">
+
+            <strong>Note:</strong>
+            This application provides a machine-learning-based
+            prediction and should not be considered a medical diagnosis.
+            For categorical fields, enter the numeric encoding used
+            when the model was trained.
+
+        </div>
+
 
     </div>
 
 
     <div class="footer">
 
-        Health Risk Prediction System • Machine Learning Powered
+        Health Risk Prediction System
+        •
+        Machine Learning Powered
 
     </div>
+
 
 </div>
 
@@ -818,10 +895,6 @@ HTML = """
 </html>
 """
 
-
-# ============================================================
-# Routes
-# ============================================================
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -834,10 +907,6 @@ def home():
 
         try:
 
-            # ------------------------------------------------
-            # Read inputs in EXACT model feature order
-            # ------------------------------------------------
-
             features = [
 
                 float(request.form["age"]),
@@ -848,43 +917,82 @@ def home():
 
                 float(request.form["bmi"]),
 
-                float(request.form["family_history_diabetes"]),
+                float(
+                    request.form[
+                        "family_history_diabetes"
+                    ]
+                ),
 
-                float(request.form["physical_activity_level"]),
+                float(
+                    request.form[
+                        "physical_activity_level"
+                    ]
+                ),
 
-                float(request.form["diet_type"]),
+                float(
+                    request.form["diet_type"]
+                ),
 
-                float(request.form["smoking_status"]),
+                float(
+                    request.form["smoking_status"]
+                ),
 
-                float(request.form["alcohol_consumption"]),
+                float(
+                    request.form["alcohol_consumption"]
+                ),
 
-                float(request.form["hours_sleep_per_night"]),
+                float(
+                    request.form[
+                        "hours_sleep_per_night"
+                    ]
+                ),
 
-                float(request.form["stress_level"]),
+                float(
+                    request.form["stress_level"]
+                ),
 
-                float(request.form["fasting_blood_sugar"]),
+                float(
+                    request.form[
+                        "fasting_blood_sugar"
+                    ]
+                ),
 
-                float(request.form["hba1c_level"]),
+                float(
+                    request.form["hba1c_level"]
+                ),
 
-                float(request.form["blood_pressure_systolic"]),
+                float(
+                    request.form[
+                        "blood_pressure_systolic"
+                    ]
+                ),
 
-                float(request.form["blood_pressure_diastolic"]),
+                float(
+                    request.form[
+                        "blood_pressure_diastolic"
+                    ]
+                ),
 
-                float(request.form["waist_circumference_cm"]),
+                float(
+                    request.form[
+                        "waist_circumference_cm"
+                    ]
+                ),
 
-                float(request.form["income_bracket"])
+                float(
+                    request.form["income_bracket"]
+                )
 
             ]
 
 
-            # Convert to numpy array
+            input_data = np.array(
+                features,
+                dtype=float
+            ).reshape(1, -1)
 
-            input_data = np.array(features).reshape(1, -1)
 
-
-            # ------------------------------------------------
             # Prediction
-            # ------------------------------------------------
 
             result = model.predict(input_data)[0]
 
@@ -894,41 +1002,48 @@ def home():
             )
 
 
-            # ------------------------------------------------
-            # Probability
-            # ------------------------------------------------
+            # Prediction probability
 
             if hasattr(model, "predict_proba"):
 
-                probabilities = model.predict_proba(input_data)[0]
+                probabilities = model.predict_proba(
+                    input_data
+                )[0]
 
                 probability = round(
-                    float(max(probabilities)) * 100,
+                    float(
+                        np.max(probabilities)
+                    ) * 100,
                     2
                 )
 
 
         except Exception as e:
 
-            error = (
-                "Unable to process the prediction. "
-                "Please check that all values are entered correctly."
+            print(
+                "Prediction Error:",
+                str(e)
             )
 
-            print("Prediction Error:", e)
+            error = (
+                "Prediction could not be completed. "
+                "Please check all entered values and "
+                "make sure they match the model's training format."
+            )
 
 
     return render_template_string(
+
         HTML,
+
         prediction=prediction,
+
         probability=probability,
+
         error=error
+
     )
 
-
-# ============================================================
-# Health Check
-# ============================================================
 
 @app.route("/health")
 def health():
@@ -939,17 +1054,17 @@ def health():
     }
 
 
-# ============================================================
-# Run App
-# ============================================================
-
 if __name__ == "__main__":
 
-    port = int(os.environ.get("PORT", 5000))
+    port = int(
+        os.environ.get(
+            "PORT",
+            5000
+        )
+    )
 
     app.run(
         host="0.0.0.0",
         port=port,
         debug=False
     )
-```
